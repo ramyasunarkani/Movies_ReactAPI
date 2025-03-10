@@ -1,0 +1,25 @@
+.control{
+     margin: 1rem auto;
+     width: 100%;
+}
+.control label{
+    display: block;
+    text-align: left;
+    font: inherit;
+    font-weight: bold;
+    margin: 0.3rem;
+   
+
+}
+.control input{
+    font-size: 1.3rem;
+    width: 100%;
+    margin: 0.3rem;
+    border-radius: 10px;
+    border: 1px solid #333;
+}
+.control textarea{
+    margin: 0.3rem;
+    width: 100%;
+    border-radius: 10px;
+}
