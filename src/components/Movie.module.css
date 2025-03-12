@@ -18,3 +18,10 @@
   margin: 0;
   font-size: 1rem;
 }
+
+.delete-btn{
+  background-color: tomato;
+}
+.delete-btn:hover{
+  background-color: rgb(200, 34, 4);
+}

@@ -13,20 +13,22 @@ function App() {
       SetisLoading(true);
       setError(null);
       try{
-        const response= await fetch('https://swapi.dev/api/films');
+        const response= await fetch('https://react-api-ba282-default-rtdb.firebaseio.com/movies.json');
         if(!response.ok){
           throw new Error ('Something went wrong ....Retrying')
         }
         const data= await response.json();
-        const transFormed=data.results.map(movie=>{
-          return{
-            id:movie.episode_id,
-            title:movie.title,
-            openingText:movie.opening_crawl,
-            releaseDate:movie.release_date,
-          }
-        })
-        setMovies(transFormed);
+        const loadedMovies=[];
+        for( const key in data){
+          loadedMovies.push({
+            id:key,
+            title:data[key].title,
+            openingText:data[key].openingText,
+            releaseDate:data[key].releaseDate
+          })
+
+        }
+        setMovies(loadedMovies);
         if(retryIntervalId){
           clearInterval(retryIntervalId);
           setRetryIntervalId(null);
@@ -69,17 +71,43 @@ function App() {
     };
   }, [retryIntervalId]);
 
-  const movieContent = useMemo(() => {
+ 
+  async function addMovieHandler(movie){
+   const response=await fetch('https://react-api-ba282-default-rtdb.firebaseio.com/movies.json',{
+      method:'POST',
+      body:JSON.stringify(movie),
+      headers:{
+        'Content-Type':'application/json'
+      }
+    })
+    const data= await response.json();
+    console.log(data)
+    setMovies(prev=>[...prev,{ id: data.name, ...movie }])
+  }
+  async function deleteMovieHandler(movieId){
+
+    try {
+      const response=await fetch(`https://react-api-ba282-default-rtdb.firebaseio.com/movies/${movieId}.json`,{
+        method:'DELETE'
+        })
+        if(!response.ok){
+          throw new Error('not delete')
+        }
+        setMovies((prevMovies) => prevMovies.filter((movie) => movie.id !== movieId));
+      }catch(error){
+    console.error(error.message);
+      }
+  }
+   const movieContent = useMemo(() => {
     if (isLoading) return <p>Loading...</p>;
     if (error) return <p>{error.message}</p>;
-    if (movies.length > 0) return <MoviesList movies={movies} />;
+    if (movies.length > 0) return <MoviesList movies={movies} onDeleteMovie={deleteMovieHandler}/>;
     return <p>No Movies found</p>;
   }, [isLoading, error, movies]);
-
   return (
     <React.Fragment>
       <section>
-        <AddMovieForm/>
+        <AddMovieForm onAddMovie={addMovieHandler}/>
       </section>
       <section>
         <button onClick={fetchMoviesHandler}>Fetch Movies</button>
